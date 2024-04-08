@@ -2,6 +2,18 @@
 import { getDb, putDb } from './database';
 import { header } from './header';
 
+const setData = function(data, localData, header){
+  console.log(data === null);
+  if(data === null)
+    {
+      return localData || header;
+    }
+  else
+    { 
+      return data
+    }
+};
+
 export default class {
   constructor() {
     const localData = localStorage.getItem('content');
@@ -25,9 +37,11 @@ export default class {
     // When the editor is ready, set the value to whatever is stored in indexeddb.
     // Fall back to localStorage if nothing is stored in indexeddb, and if neither is available, set the value to header.
     getDb().then((data) => {
-      console.log(data[data.length-1]);
+      console.log(data);
+      console.log(setData(data[data.length-1].content, localData, header))
       console.info('Loaded data from IndexedDB, injecting into editor');
-      this.editor.setValue(data[data.length-1].content|| localData || header);
+      // use set editor to avoid undefined errors when starting app
+      this.editor.setValue(setData(data[data.length-1].content, localData, header));
     });
 
     this.editor.on('change', () => {
